@@ -9,27 +9,27 @@ import java.util.concurrent.Executors;
 
 public class ThreadPoolsUtil {
 
+    private static ThreadPoolsUtil sThreadPoolsUtil;
     private ExecutorService fixedThreadPool;
     private ExecutorService cachedThreadPool;
-    private static ThreadPoolsUtil sThreadPoolsUtil;
 
-    public static ThreadPoolsUtil getInstance(){
-        if(sThreadPoolsUtil==null){
-            synchronized (ThreadPoolsUtil.class){
-                if (sThreadPoolsUtil==null){
-                    sThreadPoolsUtil=new ThreadPoolsUtil();
+    private ThreadPoolsUtil() {
+        fixedThreadPool = Executors.newFixedThreadPool(5);
+        cachedThreadPool = Executors.newCachedThreadPool();
+    }
+
+    public static ThreadPoolsUtil getInstance() {
+        if (sThreadPoolsUtil == null) {
+            synchronized (ThreadPoolsUtil.class) {
+                if (sThreadPoolsUtil == null) {
+                    sThreadPoolsUtil = new ThreadPoolsUtil();
                 }
             }
         }
         return sThreadPoolsUtil;
     }
 
-    private ThreadPoolsUtil(){
-        fixedThreadPool=Executors.newFixedThreadPool(5);
-        cachedThreadPool=Executors.newCachedThreadPool();
-    }
-
-    public  ExecutorService getFixedThreadPool() {
+    public ExecutorService getFixedThreadPool() {
         return fixedThreadPool;
     }
 

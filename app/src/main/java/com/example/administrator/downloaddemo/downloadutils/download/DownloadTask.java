@@ -22,7 +22,7 @@ import java.util.List;
 
 public class DownloadTask implements Runnable {
 
-    private final String TAG=DownloadTask.class.getSimpleName();
+    private final String TAG = DownloadTask.class.getSimpleName();
 
     private Context mContext;
     private Handler mHandler;
@@ -32,7 +32,8 @@ public class DownloadTask implements Runnable {
     private int size;
     private int threadId;
 
-    public DownloadTask(Context context, Handler handler, String downloadurl, int filesize, String filename, int threadid) {
+    public DownloadTask(Context context, Handler handler, String downloadurl, int filesize,
+            String filename, int threadid) {
         mContext = context;
         mHandler = handler;
         mDownloadurl = downloadurl;
@@ -84,7 +85,7 @@ public class DownloadTask implements Runnable {
         try {
             URL url = new URL(mDownloadurl);
             int compeltesize = info.getCompeleteSize();
-            Log.d(TAG,"first completesize is: "+compeltesize);
+            Log.d(TAG, "first completesize is: " + compeltesize);
             int startPos = info.getStartPos();      //本地数据库中的保存的开始位置跟结束位置
             int endPos = info.getEndPos();
             connection = (HttpURLConnection) url.openConnection();
@@ -92,25 +93,29 @@ public class DownloadTask implements Runnable {
             connection.setConnectTimeout(10000);
             connection.setReadTimeout(10000);
             connection.setRequestProperty("Connection", "Keep-Alive");
-            connection.setRequestProperty("Range", "bytes=" + startPos+compeltesize + "-" + endPos);
+            connection.setRequestProperty("Range",
+                    "bytes=" + startPos + compeltesize + "-" + endPos);
             inputStream = new BufferedInputStream(connection.getInputStream());
             mRandomAccessFile = new RandomAccessFile(mFilename, "rw");
-            mRandomAccessFile.seek(startPos+compeltesize);         //上次的最后的写入位置
+            mRandomAccessFile.seek(startPos + compeltesize);         //上次的最后的写入位置
             Log.d(TAG, "seek position: " + startPos + "  thread id: " + threadId);
             byte[] buffer = new byte[8 * 1024];
             int length = 0;
             while ((length = inputStream.read(buffer)) > 0) {
-                if (FileDownloader.getInstance().getDownloadState(mDownloadurl) == Constant.DOWNLOAD_STATE_PAUSE) { //下载任务被暂停
+                if (FileDownloader.getInstance().getDownloadState(mDownloadurl)
+                        == Constant.DOWNLOAD_STATE_PAUSE) { //下载任务被暂停
                     return;
                 }
 //                Log.d(TAG, "write file length: " + length);
                 mRandomAccessFile.write(buffer, 0, length);
                 compeltesize += length;
 //                Log.d(TAG,"save completesize is: "+compeltesize);
-                DBManager.getInstance(mContext).updataInfos(threadId, compeltesize, mDownloadurl);  //保存数据库中的下载进度
+                DBManager.getInstance(mContext).updataInfos(threadId, compeltesize,
+                        mDownloadurl);  //保存数据库中的下载进度
                 sendMessage(Constant.DOWNLOAD_KEEP, calculateCompeltesize(), -1, null);     //更新进度条
             }
-            Log.d(TAG, "calculateCompeltesize: " + calculateCompeltesize() + " filesize: " + size + "threadid: " + threadId);
+            Log.d(TAG, "calculateCompeltesize: " + calculateCompeltesize() + " filesize: " + size
+                    + "threadid: " + threadId);
             if (calculateCompeltesize() >= size) {      //判断下载是否完成
                 sendMessage(Constant.DOWNLOAD_COMPLETE, -1, -1, mDownloadurl);
             }

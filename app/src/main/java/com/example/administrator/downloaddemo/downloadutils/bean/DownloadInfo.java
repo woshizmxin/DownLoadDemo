@@ -12,7 +12,7 @@ public class DownloadInfo {
     private String url;// 下载器网络标识
 
     public DownloadInfo(int threadId, int startPos, int endPos,
-                        int compeleteSize, String url) {
+            int compeleteSize, String url) {
         this.threadId = threadId;
         this.startPos = startPos;
         this.endPos = endPos;

@@ -1,16 +1,13 @@
 package com.example.administrator.downloaddemo.downloadutils.download;
 
 import android.content.Context;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.example.administrator.downloaddemo.downloadutils.constant.Constant;
 import com.example.administrator.downloaddemo.downloadutils.bean.DownloadInfo;
+import com.example.administrator.downloaddemo.downloadutils.constant.Constant;
 import com.example.administrator.downloaddemo.downloadutils.db.DBManager;
-import com.example.administrator.downloaddemo.downloadutils.receiver.NetWorkChangeReceiver;
 import com.example.administrator.downloaddemo.downloadutils.utils.ThreadPoolsUtil;
 
 import java.io.File;
@@ -24,9 +21,8 @@ import java.util.HashMap;
 
 public class FileDownloader {
 
-    private final String TAG = FileDownloader.class.getSimpleName();
-
     public static FileDownloader sFileDownloader;
+    private final String TAG = FileDownloader.class.getSimpleName();
     private Context context;
     private Handler handler;
     private String downloadurl;
@@ -49,8 +45,8 @@ public class FileDownloader {
     }
 
     public synchronized FileDownloader init(Context context, Handler handler,
-                                            String downloadurl, int filesize,
-                                            String filename, int threadCount) {
+            String downloadurl, int filesize,
+            String filename, int threadCount) {
         Log.d(TAG, "Run in init");
         this.context = context;
         this.handler = handler;
@@ -69,7 +65,8 @@ public class FileDownloader {
     private void initDatas() {
         RandomAccessFile accessFile = null;
         File file;
-        int block = (filesize % threadCount == 0) ? filesize / threadCount : filesize / threadCount + 1;
+        int block =
+                (filesize % threadCount == 0) ? filesize / threadCount : filesize / threadCount + 1;
         try {
             file = new File(filename);
             if (!file.getParentFile().exists()) {
@@ -78,7 +75,8 @@ public class FileDownloader {
             if (!DBManager.getInstance(context).isHasInfos(downloadurl)) {
                 Log.d(TAG, "run download info");
                 for (int i = 0; i < threadCount; i++) {
-                    DownloadInfo info = new DownloadInfo(i, i * block, (i + 1) * block, 0, downloadurl);
+                    DownloadInfo info = new DownloadInfo(i, i * block, (i + 1) * block, 0,
+                            downloadurl);
                     DBManager.getInstance(context).saveInfo(info);
                 }
             }
@@ -108,8 +106,8 @@ public class FileDownloader {
         if (downloadStatemap == null) {
             return;
         }
-        for (String key:downloadStatemap.keySet()){
-            downloadStatemap.put(key,Constant.DOWNLOAD_STATE_PAUSE);
+        for (String key : downloadStatemap.keySet()) {
+            downloadStatemap.put(key, Constant.DOWNLOAD_STATE_PAUSE);
         }
 
     }
@@ -146,16 +144,17 @@ public class FileDownloader {
 
 
     public synchronized void startDownload() {
-        if (downloadStatemap.get(downloadurl) != null && downloadStatemap.get(downloadurl) == Constant.DOWNLOAD_STATE_START) {
+        if (downloadStatemap.get(downloadurl) != null && downloadStatemap.get(downloadurl)
+                == Constant.DOWNLOAD_STATE_START) {
             Log.d(TAG, "download return");
             return;
         }
         sendMessage(Constant.DOWNLOAD_START, filesize, -1, null);
         for (int i = 0; i < threadCount; i++) {
-            ThreadPoolsUtil.getInstance().getCachedThreadPool().execute(new DownloadTask(context, handler, downloadurl, filesize, filename, i));
+            ThreadPoolsUtil.getInstance().getCachedThreadPool().execute(
+                    new DownloadTask(context, handler, downloadurl, filesize, filename, i));
         }
     }
-
 
 
 }
@@ -172,7 +171,8 @@ public class FileDownloader {
     private int size;
     private int threadId;
 
-    public DownloadTask(Context context, Handler handler, String downloadurl, int filesize, String filename, int threadid) {
+    public DownloadTask(Context context, Handler handler, String downloadurl, int filesize,
+    String filename, int threadid) {
         mContext = context;
         mHandler = handler;
         mDownloadurl = downloadurl;
@@ -231,7 +231,8 @@ public class FileDownloader {
                 DBManager.getInstance(context).updataInfos(threadId, compeltesize, downloadurl);
                 sendMessage(Constant.DOWNLOAD_KEEP, calculateCompeltesize(), -1, null);
             }
-            Log.d(TAG, "calculateCompeltesize: " + calculateCompeltesize() + " filesize: " + filesize + "threadid: " + threadId);
+            Log.d(TAG, "calculateCompeltesize: " + calculateCompeltesize() + " filesize: " +
+            filesize + "threadid: " + threadId);
             if (calculateCompeltesize() >= filesize) {
                 sendMessage(Constant.DOWNLOAD_COMPLETE, -1, -1, downloadurl);
             }

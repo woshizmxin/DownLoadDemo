@@ -10,12 +10,13 @@ import android.net.NetworkInfo;
 
 public class NetWorkUtil {
 
-    public static boolean isNetworkAvailable(Context context){
-        ConnectivityManager connectivity=(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity!=null){
-            NetworkInfo networkinfo=connectivity.getActiveNetworkInfo();
-            if (networkinfo!=null&&networkinfo.isConnected()){
-                if (networkinfo.getState()==NetworkInfo.State.CONNECTED){
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo networkinfo = connectivity.getActiveNetworkInfo();
+            if (networkinfo != null && networkinfo.isConnected()) {
+                if (networkinfo.getState() == NetworkInfo.State.CONNECTED) {
                     return true;
                 }
             }
